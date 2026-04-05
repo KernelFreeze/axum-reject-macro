@@ -1,17 +1,18 @@
 [package]
 name = "axum-reject-macro"
-authors = ["Celeste Peláez <celeste@eufonia.studio>"]
+authors = ["Celeste Peláez <celeste@etheryal.net>"]
 description = "A macro that allows creating axum rejections easily"
 edition = "2021"
 publish = false
-license-file = "LICENSE"
+license = "MIT OR Apache-2.0"
 version = "0.1.0"
 
 [lib]
 proc-macro = true
 
 [dependencies]
-darling = "0.20.3"
+darling = "0.23.0"
+http = "1"
 proc-macro2 = "1.0.76"
 quote = "1.0.35"
 syn = "2.0.48"

@@ -1,5 +1,6 @@
 use darling::ast::{self, Fields};
 use darling::{util, FromDeriveInput, FromVariant};
+use http::StatusCode;
 use proc_macro2::TokenStream;
 use quote::{quote, ToTokens};
 use syn::{Ident, Type};
@@ -33,17 +34,27 @@ impl ToTokens for HttpError {
             .into_iter()
             .map(|variant| {
                 let ident = &variant.ident;
-                let status = variant.status;
+                let status_code = StatusCode::from_u16(variant.status)
+                    .unwrap_or_else(|_| panic!("invalid HTTP status code: {}", variant.status));
+                let status_ident = syn::Ident::new(
+                    status_code.canonical_reason()
+                        .unwrap_or_else(|| panic!("no canonical reason for status code: {}", variant.status))
+                        .to_uppercase()
+                        .replace(' ', "_")
+                        .replace('-', "_")
+                        .as_str(),
+                    proc_macro2::Span::call_site(),
+                );
                 let message = &variant.message;
                 let field = variant.fields.iter().map(|_| quote! { _ }).collect::<Vec<_>>();
 
                 if field.is_empty() {
                     quote! {
-                        Self::#ident => (axum::http::StatusCode::from_u16(#status).unwrap(), format!(r#"{{"error": "{}"}}"#, #message).to_string()).into_response()
+                        Self::#ident => (axum::http::StatusCode::#status_ident, format!(r#"{{"error": "{}"}}"#, #message).to_string()).into_response()
                     }
                 } else {
                     quote! {
-                        Self::#ident(#(#field),*) => (axum::http::StatusCode::from_u16(#status).unwrap(), format!(r#"{{"error": "{}"}}"#, #message).to_string()).into_response()
+                        Self::#ident(#(#field),*) => (axum::http::StatusCode::#status_ident, format!(r#"{{"error": "{}"}}"#, #message).to_string()).into_response()
                     }
                 }
             });
