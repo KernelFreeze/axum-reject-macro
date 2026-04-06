@@ -12,7 +12,6 @@ proc-macro = true
 
 [dependencies]
 darling = "0.23.0"
-http = "1"
 proc-macro2 = "1.0.76"
 quote = "1.0.35"
 syn = "2.0.48"
