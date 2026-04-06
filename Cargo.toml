@@ -3,7 +3,7 @@ name = "axum-reject-macro"
 authors = ["Celeste Peláez <celeste@etheryal.net>"]
 description = "A macro that allows creating axum rejections easily"
 edition = "2021"
-publish = false
+publish = true
 license = "MIT OR Apache-2.0"
 version = "0.1.0"
 
